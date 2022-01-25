@@ -1,60 +1,95 @@
 const guessedLettersElement = document.querySelector(".guessed-letters");
 const guessButton = document.querySelector(".guess");
 const letterInput = document.querySelector(".letter");
-const wordInProgress = document.querySelector(".word-in-progress");
-const remainingGuesses = document.querySelector(".remaining");
-const remainingSpan = document.querySelector(".remaining span");
+const wordsInProgress = document.querySelector(".word-in-progress");
+const guessesRemaining = document.querySelector(".remaining");
+const spanGuessRemains = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 
 const word = "magnolia";
 const guessedLetters = [];
-
-
-const wordsInProgress = function(word) {
-    const eachLetter = [];
- for (const letter of word) {
-     console.log(letter);
-     eachLetter.push("●")
- }
- wordInProgress.innerText = eachLetter.join("");
+ 
+const placeholder = function (word) {
+    const individualDots = [];
+    for (const letter of word) {
+        console.log(letter);
+        individualDots.push("●");
+    }
+    wordsInProgress.innerText = individualDots.join("");
 };
 
-wordsInProgress(word);
+placeholder(word);
 
-guessButton.addEventListener("click", function (e) {
+guessButton.addEventListener("click",  function (e) {
     e.preventDefault();
-      message.innerText = "";
-    const guessInput = letterInput.value;
-    //console.log(guessInput)
-    const goodGuess = validateInput(guessInput);
+    // empty message here
+    message.innerText = "";
+    // grab answer that was entered into input
+    const guess = letterInput.value;
+    
+    // make sure it's a single letter
+    const goodGuess = validatedInput(guess);
 
     if (goodGuess) {
-        makeGuess(guessInput);
+    // We've got a letter! Let's guess!
+        makeGuess(guess);
     }
-    letterInput.value = "";    
+    letterInput.value = "";
 });
 
-const validateInput = function (input) {
+const validatedInput = function (input) {
     const acceptedLetter = /[a-zA-Z]/;
     if (input.length === 0) {
-        message.innerText = "Please guess a letter.";
+        message.innerText = "Please enter a guess!";
     } else if (input.length > 1) {
-        message.innerText = "Please guess just one letter at a time.";
+        message.innerText = "Only one guess at a time!";
     } else if (!input.match(acceptedLetter)) {
-        message.innerText = "Please guess a letter from A-Z.";
+        message.innerText = "A-Z letters only, please!";
     } else {
         return input;
     }
 };
 
-const makeGuess = function (guessInput) {
-    guessInput = guessInput.toUpperCase();
-
-    if (guessedLetters.includes(guessInput)) {
-        message.innerText = "You already guessed that letter, silly. Try again!";
+const makeGuess = function (guess) {
+    guess = guess.toUpperCase();
+    if (guessedLetters.includes(guess)) {
+        message.innerText = "You've already guessed that letter, silly!";   
     } else {
-        guessedLetters.push(guessInput);
+        guessedLetters.push(guess);
         console.log(guessedLetters);
+        showLettersGuessed();
+        updateWordInProgress(guessedLetters);
+    } 
+};
+
+const showLettersGuessed = function () {
+    guessedLettersElement.innerHTML = "";
+    for (const letter of guessedLetters) {
+        const li = document.createElement("li");
+        li.innerText = letter;
+        guessedLettersElement.append(li);
+    }
+};
+
+const updateWordInProgress = function (guessedLetters) {
+    const wordUpper = word.toUpperCase();
+    const wordArray = wordUpper.split("");
+    const revealWord = [];
+    for (const letter of wordArray) {
+        if (guessedLetters.includes(letter)) {
+            revealWord.push(letter.toUpperCase());
+        } else {
+            revealWord.push("●")
+        }
+    }
+    wordsInProgress.innerText = revealWord.join("");
+    didIWin();
+};
+
+const didIWin = function () {
+    if (word.toUpperCase() === wordsInProgress.innerText) {
+        message.classList.add("win");
+        message.innerHTML = `<p class ="highlight">You guessed the correct word! Congrats!</p>`
     }
 };
