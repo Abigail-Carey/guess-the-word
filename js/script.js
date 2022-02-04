@@ -8,7 +8,7 @@ const message = document.querySelector(".message");
 const playAgainButton = document.querySelector(".play-again");
 
 let word = "magnolia";
-const guessedLetters = [];
+let guessedLetters = [];
 let remainingGuesses = 8; 
 
 const getWord = async function () {
@@ -20,6 +20,7 @@ const getWord = async function () {
     placeholder(word);
 };
 
+// start off game
 getWord();
  
 const placeholder = function (word) {
@@ -111,18 +112,43 @@ const countGuessesRemaining = function (guess) {
 
     if (remainingGuesses === 0) {
         message.innerHTML = `GAME OVER! The word was <span class=highlight>${word}</span>`;
+        startOver();
     } else if (remainingGuesses === 1) {
         spanGuessRemains.innerText = `1 last chance...`;
     } else {
-        spanGuessRemains.innerText = `${remainingGuesses} guesses remaining.`
+        spanGuessRemains.innerText = `${remainingGuesses} guesses remaining.`;
     }
-}
+};
 
 const didIWin = function () {
     if (word.toUpperCase() === wordsInProgress.innerText) {
         message.classList.add("win");
-        message.innerHTML = `<p class ="highlight">You guessed the correct word! Congrats!</p>`
+        message.innerHTML = `<p class="highlight">You guessed the correct word! Congrats!</p>`;
+
+        startOver();
     }
 };
 
+const startOver = function () {
+    guessButton.classList.add("hide");
+    guessesRemaining.classList.add("hide");
+    guessedLettersElement.classList.add("hide");
+    playAgainButton.classList.remove("hide");
+};
+
+playAgainButton.addEventListener("click", function () {
+    message.classList.remove("win");
+    guessedLetters = [];
+    remainingGuesses = 8;
+    spanGuessRemains.innerText = `${remainingGuesses} guesses.`;
+    guessedLettersElement.innerHTML = "";
+    message.innerText = "";
+    // grab new word for new game
+    getWord();
+
+    guessButton.classList.remove("hide");
+    guessesRemaining.classList.remove("hide");
+    guessedLettersElement.classList.remove("hide");
+    playAgainButton.classList.add("hide");
+});
 
